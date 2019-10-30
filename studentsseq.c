@@ -93,18 +93,55 @@ Regioes *le_entrada() {
         aux->m[i] = (int *) malloc(A * sizeof(int));
         for(j = 0; j < A; j++){
             aux->m[i][j] = rand() % 100;
-            //printf("%d ", aux->m[i][j]);
         }
-        //printf("\n");
     }
     
     return aux;
 }
 
-void EncontraMedias(Regioes *reg) {
-    // int i,j;
-    // int cont = 0;
-    // for(i = 0)
+int *maior(Regioes *r) {
+    // Armazena as maiores notas de cada cidade
+    int *vet = (int *) malloc(sizeof(int) * r->R * r->C);
+
+    // Vetor ja esta ordenado => maior nota na ultima posicao
+    for (int i = 0; i < r->R*r->C; i++) {
+        vet[i] = r->m[i][A-1];
+    }
+    
+    return vet;
+}
+
+int *menor(Regioes *r){
+    // Vetor para armazenar as menores notas de cada cidade
+    int *vet = (int *)malloc(sizeof(int)*r->R*r->C);
+    
+    // Vetor ja esta ordenado => menor nota na primeira posicao
+    for (int i = 0; i < r->R*r->C; i++) {
+        vet[i] = r->m[i][0];
+    }
+
+    return vet;
+    
+}
+
+// Calcula media aritmetica para cada cidade (entre os alunos)
+int *MediaAritmetica(Regioes *reg) {
+    int i,j;
+    // vet -> armazena as medias de cada linha da matriz (cada escola)
+    int *vet = (int *)malloc(sizeof(int)*reg->C*reg->R);
+    /* soma -> armazena a soma dos valores das linhas (notas dos alunos),
+       para realizar o calculo da media */
+    int soma = 0;
+
+    for (i = 0; i < reg->C*reg->R; i++) {
+        for (j = 0; j < reg->A; j++) {
+            soma += reg->m[i][j];
+        }
+        vet[i] = soma / reg->A;
+        soma = 0;
+    }
+
+    return vet;
 }
 
 void exibe(Regioes *r) {
@@ -128,18 +165,16 @@ void libera_memoria(Regioes *r) {
     free(r);    
 }
 
+
+/* ..:: MAIN ::.. */
+/********************************************************************************************/
+
 int main(int argc, char const *argv[]) {
     int i,j;
     Regioes *regioes = le_entrada();
-
-    printf("ANTES DA ORDENACAO: \n");
-    exibe(regioes);
-
     for(int j = 0; j < regioes->C*regioes->R; j++)
         quickSort(regioes->m[j], 0, regioes->A-1);
-        
-    printf("\n\nDEPOIS DA ORDENACAO: \n");
-    exibe(regioes);
+
 
     libera_memoria(regioes);
     return 0;
