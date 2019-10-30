@@ -1,9 +1,18 @@
+/*  Trabalho 1 - Programacao Concorrente - SSC0143
+    Segundo semestre de 2019
+
+    Daniel Penna Chaves Bertazzo - 10349561
+    Gabriel Seiji Matsumoto      - 10295332
+    Leonardo Miassi Netto        - 
+
+*/
+
 #include <stdlib.h>
 #include <stdio.h>
 
 // Struct que representa as regioes
 typedef struct Regioes {
-    int R, C, A; // Numero de cidades e alunos por cidade
+    int R, C, A; // Numero de regioes, cidades e alunos por cidade
     int **m; // Matriz que representa os dados da regiao
 } Regioes;
 
