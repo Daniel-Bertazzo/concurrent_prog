@@ -121,7 +121,7 @@ void MediaAritmeticaCidade(Regioes *reg, double *maCidade) {
         for (j = 0; j < reg->A; j++) {
             maCidade[i] += reg->m[i][j];
         }
-        maCidade[i] = maCidade[i] / reg->A;
+        maCidade[i] = maCidade[i] / (double)reg->A;
     }
 }
 
@@ -139,7 +139,7 @@ double *MedianaCidade(Regioes *reg, double *medianasCidade){
         if(Decisao)
             Medianas[i] = reg->m[i][mid+1];
         else 
-            Medianas[i] = (reg->m[i][mid] + reg->m[i][mid+1]) / 2;
+            Medianas[i] = (reg->m[i][mid] + reg->m[i][mid+1]) / 2.0;
     }
 
     return vet;
@@ -152,7 +152,7 @@ void *desvioPadraoCidade(Regioes *r, double *dpCidades, int *medias) {
         for(j = 0; i < reg->A; i++)
             DesvioPadrao[i] += (reg->m[i][j] - medias[i]) * (reg->m[i][j] - medias[i]);
         }
-        DesvioPadrao[i] = sqrt(DesvioPadrao[i]/(reg->R * reg->C));
+        DesvioPadrao[i] = sqrt(DesvioPadrao[i]/(double)(reg->R * reg->C));
     }
 }
 
@@ -166,7 +166,7 @@ void MediaAritmeticaRegiao(Regioes *reg, int *maRegiao){
         }
         cont++;
         if((cont%reg->C) == 0){
-            maRegiao[regiao] = maRegiao[regiao] / reg->C*reg->A;
+            maRegiao[regiao] = maRegiao[regiao] / (double)reg->C*reg->A;
             regiao++;
         }
     }    
