@@ -38,7 +38,7 @@ Regioes *le_entrada() {
 void EncontraMedias(Regioes *reg){
     int i,j;
     int cont = 0;
-    
+    for(i = 0)
 }
 
 void libera_memoria(Regioes *r) {
