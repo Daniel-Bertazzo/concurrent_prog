@@ -3,12 +3,13 @@
 
     Daniel Penna Chaves Bertazzo - 10349561
     Gabriel Seiji Matsumoto      - 10295332
-    Leonardo Miassi Netto        - 
+    Leonardo Miassi Netto        - 9326688
 
 */
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 
 // Struct que representa as regioes
 typedef struct Regioes {
@@ -20,8 +21,7 @@ typedef struct Regioes {
 /* ..:: QUICKSORT RETIRADO DO GEEKS FOR GEEKS ::.. */
 /********************************************************************************************/
 
-void swap(int* a, int* b) 
-{ 
+void swap(int* a, int* b) { 
     int t = *a; 
     *a = *b; 
     *b = t; 
@@ -32,8 +32,7 @@ void swap(int* a, int* b)
     array, and places all smaller (smaller than pivot) 
    to left of pivot and all greater elements to right 
    of pivot */
-int partition (int arr[], int low, int high) 
-{ 
+int partition (int arr[], int low, int high) { 
     int pivot = arr[high];    // pivot 
     int i = (low - 1);  // Index of smaller element 
   
@@ -54,8 +53,7 @@ int partition (int arr[], int low, int high)
  arr[] --> Array to be sorted, 
   low  --> Starting index, 
   high  --> Ending index */
-void quickSort(int arr[], int low, int high) 
-{ 
+void quickSort(int arr[], int low, int high) { 
     if (low < high) 
     { 
         /* pi is partitioning index, arr[p] is now 
@@ -99,49 +97,97 @@ Regioes *le_entrada() {
     return aux;
 }
 
-int *maior(Regioes *r) {
-    // Armazena as maiores notas de cada cidade
-    int *vet = (int *) malloc(sizeof(int) * r->R * r->C);
-
-    // Vetor ja esta ordenado => maior nota na ultima posicao
+// Calcula as maiores notas por cidade
+void maiorCidade(Regioes *r, int *maiores) {
+    // Vetor (r->m[i]) ja esta ordenado => maior nota na ultima posicao
     for (int i = 0; i < r->R*r->C; i++) {
-        vet[i] = r->m[i][A-1];
+        maiores[i] = r->m[i][A-1];
     }
-    
-    return vet;
 }
 
-int *menor(Regioes *r){
-    // Vetor para armazenar as menores notas de cada cidade
-    int *vet = (int *)malloc(sizeof(int)*r->R*r->C);
-    
-    // Vetor ja esta ordenado => menor nota na primeira posicao
+// Calcula as menores notas por cidade
+void menorCidade(Regioes *r, int *menores) {
+    // Vetor (r->m[i]) ja esta ordenado => menor nota na primeira posicao
     for (int i = 0; i < r->R*r->C; i++) {
-        vet[i] = r->m[i][0];
+        menores[i] = r->m[i][0];
     }
-
-    return vet;
-    
 }
 
 // Calcula media aritmetica para cada cidade (entre os alunos)
-int *MediaAritmetica(Regioes *reg) {
-    int i,j;
-    // vet -> armazena as medias de cada linha da matriz (cada escola)
-    int *vet = (int *)malloc(sizeof(int)*reg->C*reg->R);
-    /* soma -> armazena a soma dos valores das linhas (notas dos alunos),
-       para realizar o calculo da media */
-    int soma = 0;
+void MediaAritmeticaCidade(Regioes *reg, double *maCidade, double *maRegiao, double *maBrasil) {
+    int i,j,cont = 0;
+    double aux = 0;
+    int regiao = 0;
 
     for (i = 0; i < reg->C*reg->R; i++) {
         for (j = 0; j < reg->A; j++) {
-            soma += reg->m[i][j];
+            maCidade[i] += reg->m[i][j];
         }
-        vet[i] = soma / reg->A;
-        soma = 0;
+        maCidade[i] = maCidade[i] / reg->A;
+        aux += maCidade[i];
+        cont++;
+        if((cont%reg->C) == 0){
+            maRegiao[regiao] = aux/reg->C;
+            regiao++;
+            aux = 0;
+        }
+    }
+    aux = 0;
+    for(i = 0; i < reg->R; i++){
+        aux += maRegiao[i];
+    }
+    *maBrasil = aux/reg->R;
+}
+
+// Calcula mediana aritmetica para cada cidade (entre os alunos)
+double *MedianaCidade(Regioes *reg, double *medianasCidade){
+    int i,j;
+    int Decisao,mid;
+
+    mid = reg->A/2;
+
+    if((reg->A%2) == 0) Decisao = 0;
+    else Decisao = 1;
+
+    for(i = 0; i < reg->R * reg->C; i++){
+        if(Decisao)
+            Medianas[i] = reg->m[i][mid+1];
+        else 
+            Medianas[i] = (reg->m[i][mid] + reg->m[i][mid+1]) / 2;
     }
 
     return vet;
+}
+
+void *desvioPadraoCidade(Regioes *r, double *dpCidades, int *medias) {
+    int i,j;
+
+    for(i = 0; i < reg->R * reg->C; i++){
+        for(j = 0; i < reg->A; i++)
+            DesvioPadrao[i] += (reg->m[i][j] - medias[i]) * (reg->m[i][j] - medias[i]);
+        }
+        DesvioPadrao[i] = sqrt(DesvioPadrao[i]/(reg->R * reg->C));
+    }
+}
+
+double *MediaAritmeticaRegiao(Regioes *reg, int *vet){
+    int i,j,cont = 0;
+    double soma; 
+    int regiao = 0;
+
+    
+    for(i = 0; i < reg->R * reg->C; i++){
+        soma += vet[i];
+        cont++;
+        if(cont == reg->C){
+            aux[regiao] = soma/reg->C;
+            regiao++;
+            cont = 0;
+            soma = 0;
+        }
+    }
+
+    return aux;    
 }
 
 void exibe(Regioes *r) {
@@ -172,6 +218,23 @@ void libera_memoria(Regioes *r) {
 int main(int argc, char const *argv[]) {
     int i,j;
     Regioes *regioes = le_entrada();
+
+    /* ..:: Alocacao dos dados necessarios ::.. */
+    // Vetores que armazenam os dados para cada cidade
+    int *maioresCidade     = (int *) malloc(sizeof(int) * r->R * r->C);
+    int *menoresCidade     = (int *) malloc(sizeof(int) * r->R*r->C);
+    double *maCidade       = (double *) calloc(r->R * r->C, sizeof(double));
+    double *medianasCidade = (double *) calloc(r->R * r->C, sizeof(double));
+    double *dpCidades      = (double *) calloc(r->R * r->C, sizeof(double));
+    
+    // Vetores que armazenam os dados para cada regiao
+    double *maRegiao    = (int *)malloc(sizeof(int)*reg->R);
+    double maBrasil;
+
+    /* ..:: Chamando Funções ::.. */
+    desvioPadraoCidade(Regioes *r, int *medias, double *dpCidades);
+    
+    
     for(int j = 0; j < regioes->C*regioes->R; j++)
         quickSort(regioes->m[j], 0, regioes->A-1);
 
