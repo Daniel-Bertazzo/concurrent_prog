@@ -125,7 +125,7 @@ void MediaAritmeticaCidade(Regioes *reg, double *maCidade) {
     }
 }
 
-// Calcula mediana aritmetica para cada cidade (entre os alunos)
+// Calcula mediana para cada cidade (entre os alunos)
 double *MedianaCidade(Regioes *reg, double *medianasCidade){
     int i,j;
     int Decisao,mid;
@@ -145,6 +145,7 @@ double *MedianaCidade(Regioes *reg, double *medianasCidade){
     return vet;
 }
 
+// Calcula o desvio padrao para cada cidade (entre os alunos)
 void *desvioPadraoCidade(Regioes *r, double *dpCidades, int *medias) {
     int i,j;
 
@@ -156,16 +157,17 @@ void *desvioPadraoCidade(Regioes *r, double *dpCidades, int *medias) {
     }
 }
 
-void MediaAritmeticaRegiao(Regioes *reg, int *maRegiao){
-    int i,j,cont = 0;
+// Calcula a media aritmetica para cada regiao (entre as cidades)
+void MediaAritmeticaRegiao(Regioes *reg, int *maRegiao) {
+    int i, j, cont = 0;
     int regiao = 0;
 
-     for (i = 0; i < reg->C*reg->R; i++) {
+    for (i = 0; i < reg->C*reg->R; i++) {
         for (j = 0; j < reg->A; j++) {
             maRegiao[regiao] += reg->m[i][j];
         }
         cont++;
-        if((cont%reg->C) == 0){
+        if ((cont%reg->C) == 0) {
             maRegiao[regiao] = maRegiao[regiao] / (double)reg->C*reg->A;
             regiao++;
         }
@@ -198,20 +200,26 @@ void libera_memoria(Regioes *r) {
 /********************************************************************************************/
 
 int main(int argc, char const *argv[]) {
-    int i,j;
+    int i, j;
     Regioes *regioes = le_entrada();
 
     /* ..:: Alocacao dos dados necessarios ::.. */
     // Vetores que armazenam os dados para cada cidade
-    int *maioresCidade     = (int *) calloc(r->R * r->C, sizeof(int));
-    int *menoresCidade     = (int *) calloc(r->R * r->C, sizeof(int));
-    double *maCidade       = (double *) calloc(r->R * r->C, sizeof(double));
+    int *maioresCidade     = (int *)    calloc(r->R * r->C, sizeof(int));
+    int *menoresCidade     = (int *)    calloc(r->R * r->C, sizeof(int));
+    double *maCidade       = (double *) calloc(r->R * r->C, sizeof(double)); // maCidade = medias aritmeticas das cidades
     double *medianasCidade = (double *) calloc(r->R * r->C, sizeof(double));
-    double *dpCidades      = (double *) calloc(r->R * r->C, sizeof(double));
+    double *dpCidade       = (double *) calloc(r->R * r->C, sizeof(double)); // dpCidade = desvios padroes das cidades
     
     // Vetores que armazenam os dados para cada regiao
     double *maRegiao = (int *) malloc(sizeof(int)*reg->R);
     double maBrasil;
+    
+    
+    // Ordena as notas de cada cidade (ordena as linhas)
+    for(i = 0; i < regioes->C*regioes->R; i++) {
+        quickSort(regioes->m[i], 0, regioes->A-1);
+    }
 
     /* ..:: Chamando Funções ::.. */
     desvioPadraoCidade(Regioes *r, int *medias, double *dpCidades);
@@ -220,11 +228,6 @@ int main(int argc, char const *argv[]) {
     menorCidade(Regioes *r, int *menores);
     maiorCidade(Regioes *r, int *maiores);
     
-    
-    for(int j = 0; j < regioes->C*regioes->R; j++) {
-        quickSort(regioes->m[j], 0, regioes->A-1);
-    }
-
     libera_memoria(regioes);
     return 0;
 }
