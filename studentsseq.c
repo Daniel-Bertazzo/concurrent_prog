@@ -105,13 +105,14 @@ void maiorCidade(Regioes *r, int *maiores) {
     }
 }
 
-// // Calcula as menores notas por cidade
-// void menorCidade(Regioes *r, int *menores) {
-//     // Vetor (r->m[i]) ja esta ordenado => menor nota na primeira posicao
-//     for (int i = 0; i < r->R*r->C; i++) {
-//         menores[i] = r->m[i][0];
-//     }
-// }
+// Calcula as menores notas por cidade
+void menorCidade(Regioes *r, int *menores) {
+    // Vetor (r->m[i]) ja esta ordenado => menor nota na primeira posicao
+    for (int i = 0; i < r->R*r->C; i++) {
+        // menores[i] = r->m[i][0];
+        menores[i] = r->m[i*r->A];
+    }
+}
 
 // // Calcula media aritmetica para cada cidade (entre os alunos)
 // void MediaAritmeticaCidade(Regioes *reg, double *maCidade) {
