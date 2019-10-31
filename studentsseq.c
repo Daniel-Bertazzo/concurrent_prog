@@ -101,7 +101,7 @@ void maiorCidade(Regioes *r, int *maiores) {
     // Vetor (r->m[i]) ja esta ordenado => maior nota na ultima posicao
     for (int i = 0; i < r->R*r->C; i++) {
         // maiores[i] = r->m[i][r->A-1];
-        maiores[i] = r->m[(i*r->A) + (r->A-1)]
+        maiores[i] = r->m[(i*r->A) + (r->A-1)];
     }
 }
 
@@ -114,17 +114,18 @@ void menorCidade(Regioes *r, int *menores) {
     }
 }
 
-// // Calcula media aritmetica para cada cidade (entre os alunos)
-// void MediaAritmeticaCidade(Regioes *reg, double *maCidade) {
-//     int i,j;
+// Calcula media aritmetica para cada cidade (entre os alunos)
+void MediaAritmeticaCidade(Regioes *r, double *maCidade) {
+    int i,j;
 
-//     for (i = 0; i < reg->C*reg->R; i++) {
-//         for (j = 0; j < reg->A; j++) {
-//             maCidade[i] += reg->m[i][j];
-//         }
-//         maCidade[i] = maCidade[i] / (double)reg->A;
-//     }
-// }
+    for (i = 0; i < r->C*r->R; i++) {
+        for (j = 0; j < r->A; j++) {
+            // maCidade[i] += r->m[i][j];
+            maCidade[i] += r->m[i*r->A + j];
+        }
+        maCidade[i] = maCidade[i] / (double)r->A;
+    }
+}
 
 // // Calcula mediana para cada cidade (entre os alunos)
 // double *MedianaCidade(Regioes *reg, double *medianasCidade){
