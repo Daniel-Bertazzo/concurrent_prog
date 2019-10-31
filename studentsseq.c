@@ -127,37 +127,39 @@ void MediaAritmeticaCidade(Regioes *r, double *maCidade) {
     }
 }
 
-// // Calcula mediana para cada cidade (entre os alunos)
-// double *MedianaCidade(Regioes *reg, double *medianasCidade){
-//     int i,j;
-//     int Decisao,mid;
+// Calcula mediana para cada cidade (entre os alunos)
+void MedianaCidade(Regioes *reg, double *medianasCidade){
+    int i,j;
+    int Decisao, mid;
 
-//     mid = reg->A/2;
+    mid = reg->A/2;
 
-//     if((reg->A%2) == 0) Decisao = 0;
-//     else Decisao = 1;
+    if((reg->A%2) == 0) Decisao = 0;
+    else Decisao = 1;
 
-//     for(i = 0; i < reg->R * reg->C; i++){
-//         if(Decisao)
-//             Medianas[i] = reg->m[i][mid+1];
-//         else 
-//             Medianas[i] = (reg->m[i][mid] + reg->m[i][mid+1]) / 2.0;
-//     }
+    for(i = 0; i < reg->R * reg->C; i++){
+        if(Decisao)
+            // medianasCidade[i] = reg->m[i][mid+1];
+            medianasCidade[i] = reg->m[(i*reg->A) + (mid+1)];
+        else 
+            // medianasCidade[i] = (reg->m[i][mid] + reg->m[i][mid+1]) / 2.0;
+            medianasCidade[i] = (reg->m[i*reg->A + mid] + reg->m[(i+reg->A) + (mid+1)]) / 2.0;
 
-//     return vet;
-// }
+    }
+}
 
-// // Calcula o desvio padrao para cada cidade (entre os alunos)
-// void *desvioPadraoCidade(Regioes *r, double *dpCidades, int *medias) {
-//     int i,j;
+// Calcula o desvio padrao para cada cidade (entre os alunos)
+void *desvioPadraoCidade(Regioes *r, double *dpCidades, int *medias) {
+    int i,j;
 
-//     for(i = 0; i < reg->R * reg->C; i++){
-//         for(j = 0; i < reg->A; i++)
-//             DesvioPadrao[i] += (reg->m[i][j] - medias[i]) * (reg->m[i][j] - medias[i]);
-//         }
-//         DesvioPadrao[i] = sqrt(DesvioPadrao[i]/(double)(reg->R * reg->C));
-//     }
-// }
+    for(i = 0; i < r->R * r->C; i++) {
+        for(j = 0; i < r->A; i++) {
+            // dpCidades[i] += (r->m[i][j] - medias[i]) * (r->m[i][j] - medias[i]);
+            dpCidades[i] += (r->m[i*r->A + j] - medias[i]) * (r->m[i*r->A + j] - medias[i]);
+        }
+        dpCidades[i] = sqrt(dpCidades[i]/(double)(r->R * r->C));
+    }
+}
 
 // // Calcula a media aritmetica para cada regiao (entre as cidades)
 // void MediaAritmeticaRegiao(Regioes *reg, int *maRegiao) {
