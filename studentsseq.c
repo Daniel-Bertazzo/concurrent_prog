@@ -96,13 +96,14 @@ Regioes *le_entrada() {
     return aux;
 }
 
-// // Calcula as maiores notas por cidade
-// void maiorCidade(Regioes *r, int *maiores) {
-//     // Vetor (r->m[i]) ja esta ordenado => maior nota na ultima posicao
-//     for (int i = 0; i < r->R*r->C; i++) {
-//         maiores[i] = r->m[i][A-1];
-//     }
-// }
+// Calcula as maiores notas por cidade
+void maiorCidade(Regioes *r, int *maiores) {
+    // Vetor (r->m[i]) ja esta ordenado => maior nota na ultima posicao
+    for (int i = 0; i < r->R*r->C; i++) {
+        // maiores[i] = r->m[i][r->A-1];
+        maiores[i] = r->m[(i*r->A) + (r->A-1)]
+    }
+}
 
 // // Calcula as menores notas por cidade
 // void menorCidade(Regioes *r, int *menores) {
