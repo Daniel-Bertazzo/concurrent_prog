@@ -4,7 +4,6 @@
     Daniel Penna Chaves Bertazzo - 10349561
     Gabriel Seiji Matsumoto      - 10295332
     Leonardo Miassi Netto        - 9326688
-
 */
 
 #include <stdlib.h>
@@ -278,7 +277,7 @@ double medianaBrasil(Regioes *r) {
 
 }
 
-double dpBrasil(Regioes *r, double maBrasil) {
+double desvioPadraoBrasil(Regioes *r, double maBrasil) {
     double soma;
     int n = r->R*r->C*r->A;
     for (int i = 0; i < n; i++){
@@ -309,7 +308,7 @@ void exibe(Regioes *r) {
 //     //Resultado por Cidade
 //     for(int i = 0; i < r->R; i++){
 //         for(int j = 0; j < r->C; j++){
-//             printf("Reg %d - Cid %d: menor: %d, maior: %d, mediana: %d, media: %d e DP: %d\n", i, j, menoresCidade[j], maioresCidade[j], medianasCidade[j], maCidade[j], dpCidade[j]);
+//             printf("Reg %d - Cid %d: menor: %d, maior: %d, mediana: %lf, media: %lf e DP: %lf\n", i, j, menoresCidade[j], maioresCidade[j], medianasCidade[j], maCidade[j], dpCidade[j]);
 //             if(MaiorMediaCidade < maCidade[j]){
 //                 MaiorMediaCidade = maCidade[j];
 //                 QualCidade = j;
@@ -321,7 +320,7 @@ void exibe(Regioes *r) {
     
 //     //Resultado por Regiao
 //     for(int i = 0; i < r->R; i++){
-//         printf("Reg %d: menor: %d, maior: %d, mediana: %d, media: %d e DP: %d\n", i, menoresRegiao[j], maioresRegiao[j], medianasRegiao[j], maRegiao[j], dpRegiao[j]);    
+//         printf("Reg %d: menor: %d, maior: %d, mediana: %lf, media: %lf e DP: %lf\n", i, menoresRegiao[j], maioresRegiao[j], medianasRegiao[j], maRegiao[j], dpRegiao[j]);    
 //         if(MaiorMediaRegiao < maRegiao[i]){
 //             MaiorMediaRegiao = maRegiao[i];
 //             QualRegiao = i;
@@ -349,6 +348,7 @@ void libera_memoria(Regioes *r) {
 
 int main(int argc, char const *argv[]) {
     int i, j;
+
     Regioes *regioes = le_entrada();
 
     /* ..:: Alocacao dos dados necessarios ::.. */
@@ -367,11 +367,11 @@ int main(int argc, char const *argv[]) {
     double *dpRegiao       = (double *) calloc(regioes->R, sizeof(double));
     
     // Variaveis que armazenam os dados para o Brasil todo
-    int maiorBrasil      = 0; 
-    int menorBrasil      = 0;
-    double maBrasil      = 0.0;
-    double medianaBrasil = 0.0;
-    double dpBrasil      = 0.0;
+    int majorBrasil = 0; 
+    int minorBrasil = 0;
+    double maBrasil = 0.0;
+    double meBrasil = 0.0;
+    double dpBrasil = 0.0;
 
 
     // Ordena as notas de cada cidade (ordena as linhas)
@@ -380,9 +380,12 @@ int main(int argc, char const *argv[]) {
         quickSort(regioes->m, i * tamCidade, (i*tamCidade) + (tamCidade-1));
     }
 
-    /* ..:: Chamando funcoes para as cidades ::.. */
-    /* CHAMAR AS FUNCOES DAS CIDADES AQUI */    
-
+    // Chamando funcoes para as cidades
+    maiorCidade(regioes,maioresCidade);
+    menorCidade(regioes,menoresCidade);
+    mediaAritmeticaCidade(regioes,maCidade);
+    medianaCidade(regioes,medianasCidade);
+    desvioPadraoCidade(regioes,dpCidade,maCidade);
 
     // Ordena as notas das regioes (ordena os blocos CxA que representam as regioes)
     int tamRegiao = regioes->C * regioes->A;
@@ -390,14 +393,62 @@ int main(int argc, char const *argv[]) {
         quickSort(regioes->m, i * tamRegiao, (i*tamRegiao) + (tamRegiao-1));
     }
 
-    /* ..:: Chamando funcoes para as regioes ::.. */
-    /* CHAMAR AS FUNCOES DAS REGIOES AQUI */    
+    // Chamando funcoes para as regioes
+    maiorRegiao(regioes,maioresRegiao);
+    menorRegiao(regioes,menoresRegiao);
+    mediaAritmeticaRegiao(regioes,maRegiao);
+    medianaRegiao(regioes,medianasRegiao);
+    desvioPadraoRegiao(regioes,dpRegiao,maRegiao);
 
     // Ordena todos os dados do pais
     quickSort(regioes->m, 0, regioes->R * regioes->C * regioes->A);
 
-    /* ..:: Chamando funcoes para o Brasil ::.. */
-    /* CHAMAR AS FUNCOES DO BRASIL AQUI */    
+    // Chamando funcoes para o Brasil
+    majorBrasil = maiorBrasil(regioes);
+    minorBrasil = menorBrasil(regioes);
+    maBrasil = mediaAritmeticaBrasil(regioes);
+    meBrasil = medianaBrasil(regioes);
+    dpBrasil = desvioPadraoBrasil(regioes,maBrasil);
+
+
+    /* ..:: Imprimir os resultados ::.. */
+    float maiorMediaCidade = maCidade[0], maiorMediaRegiao = maRegiao[0];
+    int qualCidade = 0, qualCidadeRegiao = 0, qualRegiao = 0;
+    
+    for(int i = 0; i < regioes->R; i++){
+        for(int j = 0; j < regioes->C; j++){
+            printf("Reg %d - Cid %d: menor: %d, maior: %d, mediana: %.2lf, media: %.2lf e DP: %.2lf\n",
+                    i, j, menoresCidade[j], maioresCidade[j], medianasCidade[j], maCidade[j], dpCidade[j]);
+
+            if(maiorMediaCidade < maCidade[j]){
+                maiorMediaCidade = maCidade[j];
+                qualCidade = j;
+                qualCidadeRegiao = i;
+            }
+        }
+        printf("\n");
+    }
+    
+    //Resultado por Regiao
+    for(int i = 0; i < regioes->R; i++){
+        printf("Reg %d: menor: %d, maior: %d, mediana: %.2lf, media: %.2lf e DP: %.2lf\n",
+                i, menoresRegiao[j], maioresRegiao[j], medianasRegiao[j], maRegiao[j], dpRegiao[j]);    
+
+        if(maiorMediaRegiao < maRegiao[i]){
+            maiorMediaRegiao = maRegiao[i];
+            qualRegiao = i;
+        }
+    }
+    printf("\n");
+    
+    //Resultado geral do Brasil
+    printf("Brasil: menor: %d, maior: %d, mediana: %.2lf, media: %.2lf e DP: %.2lf\n",
+            minorBrasil, majorBrasil, meBrasil, maBrasil, dpBrasil);
+
+    printf("\n");
+    //Melhores Classificações
+    printf("Melhor região: Região %d\n", qualRegiao);
+    printf("Melhor cidade: Região %d, Cidade %d\n", qualCidadeRegiao, qualCidade);
 
 
     /* ..:: Liberacao de memoria ::.. */
