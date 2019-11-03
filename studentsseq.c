@@ -215,8 +215,8 @@ void mediaAritmeticaRegiao(Regioes *r, double *maRegiao) {
     // Itera sobre as R regioes
     for (i = 0; i < r->R; i++) {
         // Itera sobre todos os dados de cada regiao
-        for (j = i * tamRegiao; j < (i*tamRegiao) + (tamRegiao-1); j++) {
-            maRegiao[i] += r->m[i*r->A + j];
+        for (j = 0; j < tamRegiao; j++) {
+            maRegiao[i] += r->m[i*tamRegiao + j];
         }
         maRegiao[i] = maRegiao[i] / (double)tamRegiao;
     }
@@ -247,13 +247,13 @@ void medianaRegiao(Regioes *r, double *medianasRegiao){
 // Calcula o desvio padrao para cada regiao 
 void *desvioPadraoRegiao(Regioes *r, double *dpRegiao, double *maRegiao) {
     int i,j;
-    double tamRegiao = r->A * r->C;
+    int tamRegiao = r->A * r->C;
 
     for(i = 0; i < r->R ; i++){
-        for(j = i * tamRegiao; j < (i*tamRegiao) + (tamRegiao-1); j++) {
-            dpRegiao[i] += (r->m[i*r->A + j] - maRegiao[i]) * (r->m[i*r->A + j] - maRegiao[i]);
+        for(j = 0; j < tamRegiao; j++) {
+            dpRegiao[i] += (r->m[i*tamRegiao + j] - maRegiao[i]) * (r->m[i*tamRegiao + j] - maRegiao[i]);
         }
-        dpRegiao[i] = sqrt(dpRegiao[i]/(tamRegiao-1.0));
+        dpRegiao[i] = sqrt(dpRegiao[i]/(double)(tamRegiao-1.0));
     }
 }
 
