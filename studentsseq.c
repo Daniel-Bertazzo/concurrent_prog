@@ -120,7 +120,6 @@ Regioes *le_entrada() {
 void maiorCidade(Regioes *r, int *maioresCidade) {
     // Vetor (r->m[i]) ja esta ordenado => maior nota na ultima posicao
     for (int i = 0; i < r->R*r->C; i++) {
-        // maioresCidade[i] = r->m[i][r->A-1];
         maioresCidade[i] = r->m[(i*r->A) + (r->A-1)];
     }
 }
@@ -130,7 +129,6 @@ void maiorCidade(Regioes *r, int *maioresCidade) {
 void menorCidade(Regioes *r, int *menoresCidade) {
     // Vetor (r->m[i]) ja esta ordenado => menor nota na primeira posicao
     for (int i = 0; i < r->R*r->C; i++) {
-        // menoresCidade[i] = r->m[i][0];
         menoresCidade[i] = r->m[i*r->A];
     }
 }
@@ -142,7 +140,6 @@ void mediaAritmeticaCidade(Regioes *r, double *maCidade) {
 
     for (i = 0; i < r->C*r->R; i++) {
         for (j = 0; j < r->A; j++) {
-            // maCidade[i] += r->m[i][j];
             maCidade[i] += r->m[i*r->A + j];
         }
         maCidade[i] = maCidade[i] / (double)r->A;
@@ -177,7 +174,6 @@ void *desvioPadraoCidade(Regioes *r, double *dpCidade, double *maCidade) {
 
     for(i = 0; i < r->R * r->C; i++) {
         for(j = 0; j < n; j++) {
-            // dpCidade[i] += (r->m[i][j] - maCidade[i]) * (r->m[i][j] - maCidade[i]);
             dpCidade[i] += (r->m[i*r->A + j] - maCidade[i]) * (r->m[i*r->A + j] - maCidade[i]);
         }
         dpCidade[i] = sqrt(dpCidade[i]/(n-1.0));
@@ -192,7 +188,6 @@ void maiorRegiao(Regioes *r, int *maioresRegiao) {
     // Vetor (r->m[i]) ja esta ordenado => maior nota na ultima posicao
     int tamRegiao = r->C * r->A;
     for (int i = 0; i < r->R; i++) {
-        // maioresRegiao[i] = r->m[i][r->A-1];
         maioresRegiao[i] = r->m[(i*tamRegiao) + (tamRegiao-1)];
     }
 }
@@ -202,7 +197,6 @@ void menorRegiao(Regioes *r, int *menoresRegiao) {
     // Vetor (r->m[i]) ja esta ordenado => menor nota na primeira posicao
     int tamRegiao = r->C * r->A;
     for (int i = 0; i < r->R; i++) {
-        // menoresRegiao[i] = r->m[i][0];
         menoresRegiao[i] = r->m[i*tamRegiao];
     }
 }
@@ -392,7 +386,12 @@ int main(int argc, char const *argv[]) {
     desvioPadraoRegiao(regioes, dpRegiao, maRegiao);
 
     // Ordena todos os dados do pais
-    quickSort(regioes->m, 0, regioes->R * regioes->C * regioes->A);
+    quickSort(regioes->m, 0, (regioes->R * regioes->C * regioes->A) - 1);
+
+    printf("MATRIZ ORDENADA POR Brasil: \n");
+    exibe(regioes);
+    printf("\n\n");
+
 
     // Chamando funcoes para o Brasil
     majorBrasil = maiorBrasil(regioes);
