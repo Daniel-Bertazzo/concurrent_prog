@@ -78,7 +78,7 @@ Regioes *le_teste() {
     aux->C = C;
     aux->A = A;
 
-    aux->m = (int *) malloc(R*C*A * sizeof(int *));
+    aux->m = (int *) malloc(R*C*A * sizeof(int));
     for(i = 0; i < R*C; i++) {    
         for(j = 0; j < A; j++) {
             scanf("%d", &aux->m[i*A + j]);
@@ -162,7 +162,7 @@ void medianaCidade(Regioes *r, double *medianasCidade){
 
     for(i = 0; i < r->R * r->C; i++){
         if(decisao){
-            medianasCidade[i] = r->m[i*r->A + (mid-1)];
+            medianasCidade[i] = r->m[i*r->A + mid];
         }
         else {
             medianasCidade[i] = (double)(r->m[i*r->A + (mid-1)] + r->m[(i*r->A) + (mid)]) / 2.0;
@@ -226,20 +226,19 @@ void mediaAritmeticaRegiao(Regioes *r, double *maRegiao) {
 void medianaRegiao(Regioes *r, double *medianasRegiao){
     int i, j;
     int decisao, mid;
+    int tamRegiao = r->A * r->C;
 
     mid = (r->A * r->C)/2;
 
-    if (((r->A * r->C)%2) == 0) decisao = 0;
+    if (((tamRegiao)%2) == 0) decisao = 0;
     else decisao = 1;
 
     for(i = 0; i < r->R; i++){
         if(decisao) {
-            // medianasRegiao[i] = r->m[i][mid+1];
-            medianasRegiao[i] = r->m[(i*r->A) + (mid+1)];
+            medianasRegiao[i] = r->m[(i*tamRegiao) + (mid)];
         }
         else { 
-            // medianasRegiao[i] = (r->m[i][mid] + r->m[i][mid+1]) / 2.0;
-            medianasRegiao[i] = (r->m[i*r->A + mid] + r->m[(i+r->A) + (mid+1)]) / 2.0;
+            medianasRegiao[i] = (double)(r->m[i*tamRegiao + (mid-1)] + r->m[(i*tamRegiao) + (mid)]) / 2.0;
         }
 
     }
@@ -248,14 +247,13 @@ void medianaRegiao(Regioes *r, double *medianasRegiao){
 // Calcula o desvio padrao para cada regiao 
 void *desvioPadraoRegiao(Regioes *r, double *dpRegiao, double *maRegiao) {
     int i,j;
-    int tamRegiao = r->A * r->C;
+    double tamRegiao = r->A * r->C;
 
     for(i = 0; i < r->R ; i++){
         for(j = i * tamRegiao; j < (i*tamRegiao) + (tamRegiao-1); j++) {
-            // dpRegiao[i] += (r->m[i][j] - medias[i]) * (r->m[i][j] - medias[i]);
             dpRegiao[i] += (r->m[i*r->A + j] - maRegiao[i]) * (r->m[i*r->A + j] - maRegiao[i]);
         }
-        dpRegiao[i] = sqrt(dpRegiao[i]/(double)(tamRegiao));
+        dpRegiao[i] = sqrt(dpRegiao[i]/(tamRegiao-1.0));
     }
 }
 
@@ -288,7 +286,7 @@ double medianaBrasil(Regioes *r) {
     int mid = tamBrasil / 2;
 
     if (((r->R * r->C * r->A) % 2) == 0) {
-        return (double)(r->m[mid] + r->m[mid+1]) / 2.0;
+        return (double)(r->m[mid-1] + r->m[mid]) / 2.0;
     }
     else {
         return (double)r->m[mid];
@@ -298,11 +296,12 @@ double medianaBrasil(Regioes *r) {
 
 double desvioPadraoBrasil(Regioes *r, double maBrasil) {
     double soma;
-    int n = r->R*r->C*r->A;
+    double n = r->R*r->C*r->A;
+
     for (int i = 0; i < n; i++){
         soma += (r->m[i] - maBrasil) * (r->m[i] - maBrasil);
     }
-    return sqrt(soma/n);
+    return sqrt(soma/(n-1.0));
 }
 
 /* ..:: Exibição ::.. */
@@ -329,6 +328,7 @@ int main(int argc, char const *argv[]) {
 
     // Regioes *regioes = le_entrada();
     Regioes *regioes = le_teste();
+
 
     /* ..:: Alocacao dos dados necessarios ::.. */
     // Vetores que armazenam os dados para cada cidade
@@ -380,6 +380,10 @@ int main(int argc, char const *argv[]) {
         quickSort(regioes->m, i * tamRegiao, (i*tamRegiao) + (tamRegiao-1));
     }
 
+    printf("MATRIZ ORDENADA POR REGIAO: \n");
+    exibe(regioes);
+    printf("\n\n");
+
     // Chamando funcoes para as regioes
     maiorRegiao(regioes, maioresRegiao);
     menorRegiao(regioes, menoresRegiao);
@@ -399,19 +403,21 @@ int main(int argc, char const *argv[]) {
 
 
     /* ..:: Imprimir os resultados ::.. */
-    float maiorMediaCidade = maCidade[0], maiorMediaRegiao = maRegiao[0];
+    double maiorMediaCidade = maCidade[0], maiorMediaRegiao = maRegiao[0];
     int qualCidade = 0, qualCidadeRegiao = 0, qualRegiao = 0;
+    int n = regioes->A, cont = 0;
     
-    for(int i = 0; i < regioes->R; i++){
-        for(int j = 0; j < regioes->C; j++){
+    for(i = 0; i < regioes->R; i++){
+        for(j = 0; j < regioes->C; j++){
             printf("Reg %d - Cid %d: menor: %d, maior: %d, mediana: %.2lf, media: %.2lf e DP: %.2lf\n",
-                    i, j, menoresCidade[j], maioresCidade[j], medianasCidade[j], maCidade[j], dpCidade[j]);
+                    i, j, menoresCidade[cont], maioresCidade[cont], medianasCidade[cont], maCidade[cont], dpCidade[cont]);
 
-            if(maiorMediaCidade < maCidade[j]){
-                maiorMediaCidade = maCidade[j];
+            if(maiorMediaCidade < maCidade[cont]){
+                maiorMediaCidade = maCidade[cont];
                 qualCidade = j;
                 qualCidadeRegiao = i;
             }
+            cont++;
         }
         printf("\n");
     }
