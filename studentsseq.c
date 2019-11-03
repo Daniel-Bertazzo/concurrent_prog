@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <omp.h>
 
 // Struct que representa as regioes
 typedef struct Regioes {
@@ -320,8 +321,8 @@ void exibe(Regioes *r) {
 int main(int argc, char const *argv[]) {
     int i, j;
 
-    // Regioes *regioes = le_entrada();
-    Regioes *regioes = le_teste();
+    Regioes *regioes = le_entrada();
+    // Regioes *regioes = le_teste();
 
 
     /* ..:: Alocacao dos dados necessarios ::.. */
@@ -346,9 +347,11 @@ int main(int argc, char const *argv[]) {
     double meBrasil = 0.0;
     double dpBrasil = 0.0;
 
-    printf("MATRIZ ORIGINAL: \n");
-    exibe(regioes);
-    printf("\n\n");
+    // printf("MATRIZ ORIGINAL: \n");
+    // exibe(regioes);
+    // printf("\n\n");
+
+    double wtime = omp_get_wtime();
 
     // Ordena as notas de cada cidade (ordena as linhas)
     int tamCidade = regioes->A;
@@ -357,9 +360,9 @@ int main(int argc, char const *argv[]) {
     }
 
 
-    printf("MATRIZ ORIGINAL ORDENADA POR CIDADE: \n");
-    exibe(regioes);
-    printf("\n\n");
+    // printf("MATRIZ ORIGINAL ORDENADA POR CIDADE: \n");
+    // exibe(regioes);
+    // printf("\n\n");
 
     // Chamando funcoes para as cidades
     maiorCidade(regioes, maioresCidade);
@@ -374,9 +377,9 @@ int main(int argc, char const *argv[]) {
         quickSort(regioes->m, i * tamRegiao, (i*tamRegiao) + (tamRegiao-1));
     }
 
-    printf("MATRIZ ORDENADA POR REGIAO: \n");
-    exibe(regioes);
-    printf("\n\n");
+    // printf("MATRIZ ORDENADA POR REGIAO: \n");
+    // exibe(regioes);
+    // printf("\n\n");
 
     // Chamando funcoes para as regioes
     maiorRegiao(regioes, maioresRegiao);
@@ -388,9 +391,9 @@ int main(int argc, char const *argv[]) {
     // Ordena todos os dados do pais
     quickSort(regioes->m, 0, (regioes->R * regioes->C * regioes->A) - 1);
 
-    printf("MATRIZ ORDENADA POR Brasil: \n");
-    exibe(regioes);
-    printf("\n\n");
+    // printf("MATRIZ ORDENADA POR Brasil: \n");
+    // exibe(regioes);
+    // printf("\n\n");
 
 
     // Chamando funcoes para o Brasil
@@ -400,6 +403,7 @@ int main(int argc, char const *argv[]) {
     meBrasil = medianaBrasil(regioes);
     dpBrasil = desvioPadraoBrasil(regioes,maBrasil);
 
+    wtime = omp_get_wtime() - wtime;    
 
     /* ..:: Imprimir os resultados ::.. */
     double maiorMediaCidade = maCidade[0], maiorMediaRegiao = maRegiao[0];
@@ -442,6 +446,8 @@ int main(int argc, char const *argv[]) {
     printf("Melhor região: Região %d\n", qualRegiao);
     printf("Melhor cidade: Região %d, Cidade %d\n", qualCidadeRegiao, qualCidade);
 
+
+    printf("Tempo de resposta sem considerar E/S, em segundos: %fs\n", wtime);
 
     /* ..:: Liberacao de memoria ::.. */
     free(regioes->m);
