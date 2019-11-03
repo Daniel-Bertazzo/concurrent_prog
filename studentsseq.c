@@ -68,6 +68,26 @@ void quickSort(int arr[], int low, int high) {
 
 /* ..:: TRABALHO ::.. */
 
+Regioes *le_teste() {
+    int R, A, C;
+    int i, j;
+    scanf("%d %d %d", &R, &C, &A);
+
+    Regioes *aux = (Regioes *) malloc(sizeof(Regioes));
+    aux->R = R;
+    aux->C = C;
+    aux->A = A;
+
+    aux->m = (int *) malloc(R*C*A * sizeof(int *));
+    for(i = 0; i < R*C; i++) {    
+        for(j = 0; j < A; j++) {
+            scanf("%d", &aux->m[i*A + j]);
+        }
+    }
+
+    return aux;
+}
+
 Regioes *le_entrada() {
     // Le a entrada do arquivo
     int R, A, C, seed;
@@ -86,7 +106,7 @@ Regioes *le_entrada() {
     aux->m = (int *) malloc(R*C*A * sizeof(int *));
     for(i = 0; i < R*C; i++) {    
         for(j = 0; j < A; j++) {
-            aux->m[i*A + j] = rand() % 100;
+            aux->m[i*A + j] = rand() % 101; // Valores de 0 a 100
         }
     }
     
@@ -134,34 +154,33 @@ void medianaCidade(Regioes *r, double *medianasCidade){
     int i,j;
     int decisao, mid;
 
+    // meio = num_colunas / 2
     mid = r->A/2;
 
     if((r->A%2) == 0) decisao = 0;
     else decisao = 1;
 
     for(i = 0; i < r->R * r->C; i++){
-        if(decisao) {
-            // medianasCidade[i] = r->m[i][mid+1];
-            medianasCidade[i] = r->m[(i*r->A) + (mid+1)];
+        if(decisao){
+            medianasCidade[i] = r->m[i*r->A + (mid-1)];
         }
         else {
-            // medianasCidade[i] = (r->m[i][mid] + r->m[i][mid+1]) / 2.0;
-            medianasCidade[i] = (r->m[i*r->A + mid] + r->m[(i+r->A) + (mid+1)]) / 2.0;
+            medianasCidade[i] = (double)(r->m[i*r->A + (mid-1)] + r->m[(i*r->A) + (mid)]) / 2.0;
         }
-
     }
 }
 
 // Calcula o desvio padrao para cada cidade (entre os alunos)
 void *desvioPadraoCidade(Regioes *r, double *dpCidade, double *maCidade) {
     int i, j;
+    double n = r->A;
 
     for(i = 0; i < r->R * r->C; i++) {
-        for(j = 0; j < r->A; j++) {
+        for(j = 0; j < n; j++) {
             // dpCidade[i] += (r->m[i][j] - maCidade[i]) * (r->m[i][j] - maCidade[i]);
             dpCidade[i] += (r->m[i*r->A + j] - maCidade[i]) * (r->m[i*r->A + j] - maCidade[i]);
         }
-        dpCidade[i] = sqrt(dpCidade[i]/(double)(r->R * r->C));
+        dpCidade[i] = sqrt(dpCidade[i]/(n-1.0));
     }
 }
 
@@ -308,7 +327,8 @@ void exibe(Regioes *r) {
 int main(int argc, char const *argv[]) {
     int i, j;
 
-    Regioes *regioes = le_entrada();
+    // Regioes *regioes = le_entrada();
+    Regioes *regioes = le_teste();
 
     /* ..:: Alocacao dos dados necessarios ::.. */
     // Vetores que armazenam os dados para cada cidade
@@ -332,12 +352,20 @@ int main(int argc, char const *argv[]) {
     double meBrasil = 0.0;
     double dpBrasil = 0.0;
 
+    printf("MATRIZ ORIGINAL: \n");
+    exibe(regioes);
+    printf("\n\n");
 
     // Ordena as notas de cada cidade (ordena as linhas)
     int tamCidade = regioes->A;
     for (i = 0; i < regioes->C*regioes->R; i++) {
         quickSort(regioes->m, i * tamCidade, (i*tamCidade) + (tamCidade-1));
     }
+
+
+    printf("MATRIZ ORIGINAL ORDENADA POR CIDADE: \n");
+    exibe(regioes);
+    printf("\n\n");
 
     // Chamando funcoes para as cidades
     maiorCidade(regioes, maioresCidade);
@@ -391,7 +419,7 @@ int main(int argc, char const *argv[]) {
     //Resultado por Regiao
     for(int i = 0; i < regioes->R; i++){
         printf("Reg %d: menor: %d, maior: %d, mediana: %.2lf, media: %.2lf e DP: %.2lf\n",
-                i, menoresRegiao[j], maioresRegiao[j], medianasRegiao[j], maRegiao[j], dpRegiao[j]);    
+                i, menoresRegiao[i], maioresRegiao[i], medianasRegiao[i], maRegiao[i], dpRegiao[i]);    
 
         if(maiorMediaRegiao < maRegiao[i]){
             maiorMediaRegiao = maRegiao[i];
