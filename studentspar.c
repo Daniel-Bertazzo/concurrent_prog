@@ -80,6 +80,7 @@ Regioes *le_teste() {
     aux->A = A;
 
     aux->m = (int *) malloc(R*C*A * sizeof(int));
+
     for(i = 0; i < R*C; i++) {    
         for(j = 0; j < A; j++) {
             scanf("%d", &aux->m[i*A + j]);
@@ -119,8 +120,11 @@ Regioes *le_entrada() {
 
 // Calcula as maiores notas por cidade
 void maiorCidade(Regioes *r, int *maioresCidade) {
+    int i;
+
     // Vetor (r->m[i]) ja esta ordenado => maior nota na ultima posicao
-    for (int i = 0; i < r->R*r->C; i++) {
+    #pragma omp parallel for
+    for (i = 0; i < r->R*r->C; i++) {
         maioresCidade[i] = r->m[(i*r->A) + (r->A-1)];
     }
 }
@@ -128,8 +132,11 @@ void maiorCidade(Regioes *r, int *maioresCidade) {
 
 // Calcula as menores notas por cidade
 void menorCidade(Regioes *r, int *menoresCidade) {
+    int i; 
+
     // Vetor (r->m[i]) ja esta ordenado => menor nota na primeira posicao
-    for (int i = 0; i < r->R*r->C; i++) {
+    #pragma omp parallel for
+    for (i = 0; i < r->R*r->C; i++) {
         menoresCidade[i] = r->m[i*r->A];
     }
 }
@@ -137,8 +144,9 @@ void menorCidade(Regioes *r, int *menoresCidade) {
 
 // Calcula media aritmetica para cada cidade (entre os alunos)
 void mediaAritmeticaCidade(Regioes *r, double *maCidade) {
-    int i,j;
+    int i, j;
 
+    #pragma omp parallel for private(i,j)
     for (i = 0; i < r->C*r->R; i++) {
         for (j = 0; j < r->A; j++) {
             maCidade[i] += r->m[i*r->A + j];
@@ -149,7 +157,7 @@ void mediaAritmeticaCidade(Regioes *r, double *maCidade) {
 
 // Calcula mediana para cada cidade (entre os alunos)
 void medianaCidade(Regioes *r, double *medianasCidade){
-    int i,j;
+    int i, j;
     int decisao, mid;
 
     // meio = num_colunas / 2
@@ -158,6 +166,7 @@ void medianaCidade(Regioes *r, double *medianasCidade){
     if((r->A%2) == 0) decisao = 0;
     else decisao = 1;
 
+    #pragma omp parallel for
     for(i = 0; i < r->R * r->C; i++){
         if(decisao){
             medianasCidade[i] = r->m[i*r->A + mid];
@@ -173,8 +182,9 @@ void *desvioPadraoCidade(Regioes *r, double *dpCidade, double *maCidade) {
     int i, j;
     double n = r->A;
 
+    #pragma omp parallel for private(i, j)
     for(i = 0; i < r->R * r->C; i++) {
-        for(j = 0; j < n; j++) {
+        for(j = 0; j < r->A; j++) {
             dpCidade[i] += (r->m[i*r->A + j] - maCidade[i]) * (r->m[i*r->A + j] - maCidade[i]);
         }
         dpCidade[i] = sqrt(dpCidade[i]/(n-1.0));
@@ -188,7 +198,10 @@ void *desvioPadraoCidade(Regioes *r, double *dpCidade, double *maCidade) {
 void maiorRegiao(Regioes *r, int *maioresRegiao) {
     // Vetor (r->m[i]) ja esta ordenado => maior nota na ultima posicao
     int tamRegiao = r->C * r->A;
-    for (int i = 0; i < r->R; i++) {
+    int i;
+
+    #pragma omp parallel for
+    for (i = 0; i < r->R; i++) {
         maioresRegiao[i] = r->m[(i*tamRegiao) + (tamRegiao-1)];
     }
 }
@@ -197,7 +210,10 @@ void maiorRegiao(Regioes *r, int *maioresRegiao) {
 void menorRegiao(Regioes *r, int *menoresRegiao) {
     // Vetor (r->m[i]) ja esta ordenado => menor nota na primeira posicao
     int tamRegiao = r->C * r->A;
-    for (int i = 0; i < r->R; i++) {
+    int i;
+
+    #pragma omp parallel for
+    for (i = 0; i < r->R; i++) {
         menoresRegiao[i] = r->m[i*tamRegiao];
     }
 }
@@ -208,6 +224,7 @@ void mediaAritmeticaRegiao(Regioes *r, double *maRegiao) {
     int tamRegiao = r->A * r->C;
 
     // Itera sobre as R regioes
+    #pragma omp parallel for private(i, j)
     for (i = 0; i < r->R; i++) {
         // Itera sobre todos os dados de cada regiao
         for (j = 0; j < tamRegiao; j++) {
@@ -228,6 +245,7 @@ void medianaRegiao(Regioes *r, double *medianasRegiao){
     if (((tamRegiao)%2) == 0) decisao = 0;
     else decisao = 1;
 
+    #pragma omp parallel for 
     for(i = 0; i < r->R; i++){
         if(decisao) {
             medianasRegiao[i] = r->m[(i*tamRegiao) + (mid)];
@@ -244,6 +262,7 @@ void *desvioPadraoRegiao(Regioes *r, double *dpRegiao, double *maRegiao) {
     int i,j;
     int tamRegiao = r->A * r->C;
 
+    #pragma omp parallel for private(i, j)
     for(i = 0; i < r->R ; i++){
         for(j = 0; j < tamRegiao; j++) {
             dpRegiao[i] += (r->m[i*tamRegiao + j] - maRegiao[i]) * (r->m[i*tamRegiao + j] - maRegiao[i]);
@@ -267,9 +286,11 @@ int menorBrasil(Regioes *r) {
 
 double mediaAritmeticaBrasil(Regioes *r) {
     double maBrasil = 0.0;
-    int tamBrasil = r->R * r->C * r->A; 
+    int tamBrasil = r->R * r->C * r->A;
+    int i;
 
-    for (int i = 0; i < tamBrasil; i++) {
+    #pragma omp parallel for 
+    for (i = 0; i < tamBrasil; i++) {
         maBrasil += r->m[i];
     }
 
@@ -292,8 +313,10 @@ double medianaBrasil(Regioes *r) {
 double desvioPadraoBrasil(Regioes *r, double maBrasil) {
     double soma;
     double n = r->R*r->C*r->A;
+    int i;
 
-    for (int i = 0; i < n; i++){
+    #pragma omp parallel for
+    for (i = 0; i < (int)n; i++){
         soma += (r->m[i] - maBrasil) * (r->m[i] - maBrasil);
     }
     return sqrt(soma/(n-1.0));
@@ -305,9 +328,11 @@ void exibe(Regioes *r) {
     printf("R = %d, C = %d, A = %d\n", r->R, r->C, r->A);
     int lin = r->R * r->C;
     int col = r->A;
+    int i, j;
 
-    for (int i = 0; i < lin; i++) {
-        for (int j = 0; j < col; j++) {
+    #pragma omp parallel for
+    for (i = 0; i < lin; i++) {
+        for (j = 0; j < col; j++) {
             printf("%d ", r->m[i*r->A + j]);
         }
         printf("\n");
@@ -320,6 +345,7 @@ void exibe(Regioes *r) {
 
 int main(int argc, char const *argv[]) {
     int i, j;
+    //omp_set_nested(1);
 
     Regioes *regioes = le_entrada();
     // Regioes *regioes = le_teste();

@@ -9,7 +9,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-#include <omp.h>
+#include <time.h>
+// #include <omp.h>
 
 // Struct que representa as regioes
 typedef struct Regioes {
@@ -320,6 +321,8 @@ void exibe(Regioes *r) {
 
 int main(int argc, char const *argv[]) {
     int i, j;
+    clock_t inicio, fim;
+    double delta;
 
     Regioes *regioes = le_entrada();
     // Regioes *regioes = le_teste();
@@ -352,7 +355,9 @@ int main(int argc, char const *argv[]) {
     // printf("\n\n");
 
     // Comeca a medir o tempo
-    double wtime = omp_get_wtime();
+    // double wtime = omp_get_wtime();
+
+    inicio = clock();
 
     // Ordena as notas de cada cidade (ordena as linhas)
     int tamCidade = regioes->A;
@@ -405,7 +410,9 @@ int main(int argc, char const *argv[]) {
     dpBrasil = desvioPadraoBrasil(regioes,maBrasil);
 
     // Para de medir o tempo
-    wtime = omp_get_wtime() - wtime;    
+    // wtime = omp_get_wtime() - wtime;    
+    fim = clock();
+    delta = ((double) (fim - inicio)) / CLOCKS_PER_SEC;
 
     /* ..:: Imprimir os resultados ::.. */
     double maiorMediaCidade = maCidade[0], maiorMediaRegiao = maRegiao[0];
@@ -449,7 +456,7 @@ int main(int argc, char const *argv[]) {
     printf("Melhor cidade: Região %d, Cidade %d\n", qualCidadeRegiao, qualCidade);
 
 
-    printf("Tempo de resposta sem considerar E/S, em segundos: %fs\n", wtime);
+    printf("Tempo de resposta sem considerar E/S, em segundos: %fs\n", delta);
 
     /* ..:: Liberacao de memoria ::.. */
     free(regioes->m);
