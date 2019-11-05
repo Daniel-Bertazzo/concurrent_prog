@@ -34,9 +34,10 @@ void swap(int* a, int* b) {
    of pivot */
 int partition (int arr[], int low, int high) { 
     int pivot = arr[high];    // pivot 
-    int i = (low - 1);  // Index of smaller element 
-  
-    for (int j = low; j <= high- 1; j++) 
+    int j, i = (low - 1);  // Index of smaller element 
+    
+    #pragma omp parallel for private(j)
+    for (j = low; j <= high- 1; j++) 
     { 
         // If current element is smaller than the pivot 
         if (arr[j] < pivot) 
@@ -382,6 +383,7 @@ int main(int argc, char const *argv[]) {
 
     // Ordena as notas de cada cidade (ordena as linhas)
     int tamCidade = regioes->A;
+    #pragma omp parallel for private(i)
     for (i = 0; i < regioes->C*regioes->R; i++) {
         quickSort(regioes->m, i * tamCidade, (i*tamCidade) + (tamCidade-1));
     }
@@ -400,6 +402,7 @@ int main(int argc, char const *argv[]) {
 
     // Ordena as notas das regioes (ordena os blocos CxA que representam as regioes)
     int tamRegiao = regioes->C * regioes->A;
+    #pragma omp parallel for private(i)
     for (i = 0; i < regioes->R; i++) {
         quickSort(regioes->m, i * tamRegiao, (i*tamRegiao) + (tamRegiao-1));
     }
