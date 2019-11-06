@@ -1,0 +1,24 @@
+Reg 0 - Cid 0: menor: 20, maior: 85, mediana: 40.00, media: 51.00 e DP: 29.66
+Reg 0 - Cid 1: menor: 10, maior: 50, mediana: 30.00, media: 30.00 e DP: 15.81
+Reg 0 - Cid 2: menor: 20, maior: 60, mediana: 40.00, media: 40.00 e DP: 15.81
+Reg 0 - Cid 3: menor: 35, maior: 95, mediana: 70.00, media: 67.00 e DP: 23.08
+
+Reg 1 - Cid 0: menor: 25, maior: 90, mediana: 45.00, media: 56.00 e DP: 29.66
+Reg 1 - Cid 1: menor: 15, maior: 55, mediana: 35.00, media: 35.00 e DP: 15.81
+Reg 1 - Cid 2: menor: 25, maior: 65, mediana: 45.00, media: 45.00 e DP: 15.81
+Reg 1 - Cid 3: menor: 40, maior: 100, mediana: 75.00, media: 72.00 e DP: 23.08
+
+Reg 2 - Cid 0: menor: 10, maior: 75, mediana: 30.00, media: 41.00 e DP: 29.66
+Reg 2 - Cid 1: menor: 0, maior: 40, mediana: 20.00, media: 20.00 e DP: 15.81
+Reg 2 - Cid 2: menor: 10, maior: 50, mediana: 30.00, media: 30.00 e DP: 15.81
+Reg 2 - Cid 3: menor: 25, maior: 85, mediana: 60.00, media: 57.00 e DP: 23.08
+
+Reg 0: menor: 10, maior: 95, mediana: 40.00, media: 47.00 e DP: 24.52
+Reg 1: menor: 15, maior: 100, mediana: 45.00, media: 52.00 e DP: 24.52
+Reg 2: menor: 0, maior: 85, mediana: 30.00, media: 37.00 e DP: 24.52
+
+Brasil: menor: 0, maior: 100, mediana: 40.00, media: 22.92 e DP: 29.41
+
+Melhor região: Região 1
+Melhor cidade: Região 1, Cidade 3
+Tempo de resposta sem considerar E/S, em segundos: 0.002637s
