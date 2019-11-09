@@ -6,12 +6,6 @@
     Leonardo Miassi Netto        - 9326688
 */
 
-/*
-    PCAM
-    foda-se como foi particionado
-
-    
-*/
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
