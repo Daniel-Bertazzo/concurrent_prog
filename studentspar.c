@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <time.h>
 #include <omp.h>
 
 // Struct que representa as regioes
@@ -36,7 +37,7 @@ int partition(int arr[], int low, int high) {
     int pivot = arr[high];    // pivot 
     int j, i = (low - 1);  // Index of smaller element 
     
-    for (j = low; j <= high- 1; j++) 
+    for (j = low; j <= high-1; j++) 
     { 
         // If current element is smaller than the pivot 
         if (arr[j] < pivot) 
@@ -56,11 +57,20 @@ int partition(int arr[], int low, int high) {
 void quickSort(int arr[], int low, int high) { 
     if (low < high) 
     {   
-        int pi = partition(arr, low, high); 
+        int pi;
+        #pragma omp task default(none) firstprivate(arr, low, high) shared(pi)
+        {
+            pi = partition(arr, low, high); 
+        }
         
-        
-        quickSort(arr, low, pi - 1); 
-        quickSort(arr, pi + 1, high); 
+        #pragma omp task default(none) firstprivate(arr, low, pi)
+        {
+            quickSort(arr, low, pi - 1);
+        }
+        #pragma omp task default(none) firstprivate(arr, pi, high)
+        {
+            quickSort(arr, pi + 1, high); 
+        }    
     } 
 }
 
@@ -197,7 +207,7 @@ void maiorRegiao(Regioes *r, int *maioresRegiao) {
     int tamRegiao = r->C * r->A;
     int i;
 
-    #pragma omp parallel for
+    //#pragma omp parallel for
     for (i = 0; i < r->R; i++) {
         maioresRegiao[i] = r->m[(i*tamRegiao) + (tamRegiao-1)];
     }
@@ -308,11 +318,11 @@ double medianaBrasil(Regioes *r) {
 }
 
 double desvioPadraoBrasil(Regioes *r, double maBrasil) {
-    double soma;
+    double soma = 0.0;
     double n = r->R*r->C*r->A;
     int i;
 
-    #pragma omp parallel for private(i) reduction(+:soma)
+    #pragma omp parallel for private(i) shared(n) reduction(+:soma)
     for (i = 0; i < (int)n; i++){
         soma += (r->m[i] - maBrasil) * (r->m[i] - maBrasil);
     }
@@ -341,6 +351,8 @@ void exibe(Regioes *r) {
 
 int main(int argc, char const *argv[]) {
     int i, j;
+    clock_t inicio, fim;
+    double delta;
     //omp_set_nested(1);
 
     Regioes *regioes = le_entrada();
@@ -369,12 +381,13 @@ int main(int argc, char const *argv[]) {
     double meBrasil = 0.0;
     double dpBrasil = 0.0;
 
-    printf("MATRIZ ORIGINAL: \n");
+    // printf("MATRIZ ORIGINAL: \n");
     // exibe(regioes);
-    printf("\n\n");
+    // printf("\n\n");
 
     // Comeca a medir o tempo
-    double wtime = omp_get_wtime();
+    //double wtime = omp_get_wtime();
+    inicio = clock();
 
     // Ordena as notas de cada cidade (ordena as linhas)
     int tamCidade = regioes->A;
@@ -383,16 +396,32 @@ int main(int argc, char const *argv[]) {
     }
 
 
-    printf("MATRIZ ORDENADA POR CIDADE: \n");
+    // printf("MATRIZ ORDENADA POR CIDADE: \n");
     // exibe(regioes);
-    printf("\n\n");
+    // printf("\n\n");
 
     // Chamando funcoes para as cidades
-    maiorCidade(regioes, maioresCidade);
-    menorCidade(regioes, menoresCidade);
-    mediaAritmeticaCidade(regioes, maCidade);
-    medianaCidade(regioes, medianasCidade);
+    #pragma omp parallel sections
+    {
+        #pragma omp section
+        {
+            maiorCidade(regioes, maioresCidade);
+        }
+        #pragma omp section
+        {
+            menorCidade(regioes, menoresCidade);
+        }
+        #pragma omp section
+        {
+            mediaAritmeticaCidade(regioes, maCidade);
+        }
+        #pragma omp section
+        {
+            medianaCidade(regioes, medianasCidade);
+        }
+    }
     desvioPadraoCidade(regioes, dpCidade, maCidade);
+    
 
     // Ordena as notas das regioes (ordena os blocos CxA que representam as regioes)
     int tamRegiao = regioes->C * regioes->A;
@@ -400,34 +429,69 @@ int main(int argc, char const *argv[]) {
         quickSort(regioes->m, i * tamRegiao, (i*tamRegiao) + (tamRegiao-1));
     }
 
-    printf("MATRIZ ORDENADA POR REGIAO: \n");
+    // printf("MATRIZ ORDENADA POR REGIAO: \n");
     // exibe(regioes);
-    printf("\n\n");
+    // printf("\n\n");
 
     // Chamando funcoes para as regioes
-    maiorRegiao(regioes, maioresRegiao);
-    menorRegiao(regioes, menoresRegiao);
-    mediaAritmeticaRegiao(regioes, maRegiao);
-    medianaRegiao(regioes, medianasRegiao);
+    #pragma omp parallel sections
+    {
+        #pragma omp section
+        {
+            maiorRegiao(regioes, maioresRegiao);    
+        }
+        #pragma omp section
+        {
+            menorRegiao(regioes, menoresRegiao);    
+        }
+        #pragma omp section
+        {
+            mediaAritmeticaRegiao(regioes, maRegiao);    
+        }
+        #pragma omp section
+        {
+            medianaRegiao(regioes, medianasRegiao);
+        }
+    }
     desvioPadraoRegiao(regioes, dpRegiao, maRegiao);
-
+    
+    int *a = regioes->m;
+    int t = ( (regioes->R * regioes->C * regioes->A) - 1);
     // Ordena todos os dados do pais
-    quickSort(regioes->m, 0, (regioes->R * regioes->C * regioes->A) - 1);
-
-    printf("MATRIZ ORDENADA POR Brasil: \n");
-    exibe(regioes);
-    printf("\n\n");
-
+    #pragma omp parellel default (none) shared (a,t)
+    {
+        #pragma omp single nowait
+        {
+            quickSort(a, 0, t);
+        }
+    }
 
     // Chamando funcoes para o Brasil
-    majorBrasil = maiorBrasil(regioes);
-    minorBrasil = menorBrasil(regioes);
-    maBrasil    = mediaAritmeticaBrasil(regioes);
-    meBrasil    = medianaBrasil(regioes);
-    dpBrasil    = desvioPadraoBrasil(regioes,maBrasil);
+    #pragma omp parallel sections
+    {
+        #pragma omp section
+        {
+            majorBrasil = maiorBrasil(regioes);
+        }
+        #pragma omp section
+        {
+            minorBrasil = menorBrasil(regioes);
+        }
+        #pragma omp section
+        {
+            maBrasil = mediaAritmeticaBrasil(regioes);
+        }
+        #pragma omp section
+        {
+            meBrasil = medianaBrasil(regioes);
+        }
+    }
+    dpBrasil = desvioPadraoBrasil(regioes,maBrasil);
 
     // Para de medir o tempo
-    wtime = omp_get_wtime() - wtime;    
+    //wtime = omp_get_wtime() - wtime;
+    fim = clock();
+    delta = ((double) (fim - inicio)) / CLOCKS_PER_SEC;    
 
     /* ..:: Imprimir os resultados ::.. */
     double maiorMediaCidade = maCidade[0], maiorMediaRegiao = maRegiao[0];
@@ -436,8 +500,8 @@ int main(int argc, char const *argv[]) {
     
     for(i = 0; i < regioes->R; i++){
         for(j = 0; j < regioes->C; j++){
-            // printf("Reg %d - Cid %d: menor: %d, maior: %d, mediana: %.2lf, media: %.2lf e DP: %.2lf\n",
-            //         i, j, menoresCidade[cont], maioresCidade[cont], medianasCidade[cont], maCidade[cont], dpCidade[cont]);
+            printf("Reg %d - Cid %d: menor: %d, maior: %d, mediana: %.2lf, media: %.2lf e DP: %.2lf\n",
+                    i, j, menoresCidade[cont], maioresCidade[cont], medianasCidade[cont], maCidade[cont], dpCidade[cont]);
 
             if(maiorMediaCidade < maCidade[cont]){
                 maiorMediaCidade = maCidade[cont];
@@ -446,13 +510,13 @@ int main(int argc, char const *argv[]) {
             }
             cont++;
         }
-        // printf("\n");
+        printf("\n");
     }
     
     //Resultado por Regiao
     for(int i = 0; i < regioes->R; i++){
-        // printf("Reg %d: menor: %d, maior: %d, mediana: %.2lf, media: %.2lf e DP: %.2lf\n",
-        //         i, menoresRegiao[i], maioresRegiao[i], medianasRegiao[i], maRegiao[i], dpRegiao[i]);    
+        printf("Reg %d: menor: %d, maior: %d, mediana: %.2lf, media: %.2lf e DP: %.2lf\n",
+                i, menoresRegiao[i], maioresRegiao[i], medianasRegiao[i], maRegiao[i], dpRegiao[i]);    
 
         if(maiorMediaRegiao < maRegiao[i]){
             maiorMediaRegiao = maRegiao[i];
@@ -471,9 +535,9 @@ int main(int argc, char const *argv[]) {
     printf("Melhor cidade: Região %d, Cidade %d\n", qualCidadeRegiao, qualCidade);
 
 
-    printf("Tempo de resposta sem considerar E/S, em segundos: %fs\n", wtime);
+    printf("Tempo de resposta sem considerar E/S, em segundos: %fs\n", delta);
 
-    /* ..:: Liberacao de memoria ::.. */
+    /* ..:: Liberando memoria ::.. */
     free(regioes->m);
     free(regioes);
     free(maioresCidade);

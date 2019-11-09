@@ -349,9 +349,9 @@ int main(int argc, char const *argv[]) {
     double meBrasil = 0.0;
     double dpBrasil = 0.0;
 
-    printf("MATRIZ ORIGINAL: \n");
+    // printf("MATRIZ ORIGINAL: \n");
     // exibe(regioes);
-    printf("\n\n");
+    // printf("\n\n");
 
     inicio = clock();
 
@@ -362,9 +362,9 @@ int main(int argc, char const *argv[]) {
     }
 
 
-    printf("MATRIZ ORDENADA POR CIDADE: \n");
+    // printf("MATRIZ ORDENADA POR CIDADE: \n");
     // exibe(regioes);
-    printf("\n\n");
+    // printf("\n\n");
 
     // Chamando funcoes para as cidades
     maiorCidade(regioes, maioresCidade);
@@ -379,9 +379,9 @@ int main(int argc, char const *argv[]) {
         quickSort(regioes->m, i * tamRegiao, (i*tamRegiao) + (tamRegiao-1));
     }
 
-    printf("MATRIZ ORDENADA POR REGIAO: \n");
+    // printf("MATRIZ ORDENADA POR REGIAO: \n");
     // exibe(regioes);
-    printf("\n\n");
+    // printf("\n\n");
 
     // Chamando funcoes para as regioes
     maiorRegiao(regioes, maioresRegiao);
@@ -393,9 +393,9 @@ int main(int argc, char const *argv[]) {
     // Ordena todos os dados do pais
     quickSort(regioes->m, 0, (regioes->R * regioes->C * regioes->A) - 1);
 
-    printf("MATRIZ ORDENADA POR Brasil: \n");
+    // printf("MATRIZ ORDENADA POR Brasil: \n");
     // exibe(regioes);
-    printf("\n\n");
+    // printf("\n\n");
 
 
     // Chamando funcoes para o Brasil
