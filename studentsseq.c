@@ -18,7 +18,7 @@ typedef struct Regioes {
 } Regioes;
 
 
-/* ..:: QUICKSORT RETIRADO DO GEEKS FOR GEEKS ::.. */
+/* ..:: Quicksort retirado de https://www.geeksforgeeks.org/quick-sort/ ::.. */
 /********************************************************************************************/
 
 void swap(int* a, int* b) { 
@@ -67,27 +67,8 @@ void quickSort(int arr[], int low, int high) {
     } 
 }
 
+/********************************************************************************************/
 /* ..:: TRABALHO ::.. */
-
-Regioes *le_teste() {
-    int R, A, C;
-    int i, j;
-    scanf("%d %d %d", &R, &C, &A);
-
-    Regioes *aux = (Regioes *) malloc(sizeof(Regioes));
-    aux->R = R;
-    aux->C = C;
-    aux->A = A;
-
-    aux->m = (int *) malloc(R*C*A * sizeof(int));
-    for(i = 0; i < R*C; i++) {    
-        for(j = 0; j < A; j++) {
-            scanf("%d", &aux->m[i*A + j]);
-        }
-    }
-
-    return aux;
-}
 
 Regioes *le_entrada() {
     // Le a entrada do arquivo
@@ -349,10 +330,6 @@ int main(int argc, char const *argv[]) {
     double meBrasil = 0.0;
     double dpBrasil = 0.0;
 
-    // printf("MATRIZ ORIGINAL: \n");
-    // exibe(regioes);
-    // printf("\n\n");
-
     inicio = clock();
 
     // Ordena as notas de cada cidade (ordena as linhas)
@@ -361,10 +338,6 @@ int main(int argc, char const *argv[]) {
         quickSort(regioes->m, i * tamCidade, (i*tamCidade) + (tamCidade-1));
     }
 
-
-    // printf("MATRIZ ORDENADA POR CIDADE: \n");
-    // exibe(regioes);
-    // printf("\n\n");
 
     // Chamando funcoes para as cidades
     maiorCidade(regioes, maioresCidade);
@@ -379,10 +352,6 @@ int main(int argc, char const *argv[]) {
         quickSort(regioes->m, i * tamRegiao, (i*tamRegiao) + (tamRegiao-1));
     }
 
-    // printf("MATRIZ ORDENADA POR REGIAO: \n");
-    // exibe(regioes);
-    // printf("\n\n");
-
     // Chamando funcoes para as regioes
     maiorRegiao(regioes, maioresRegiao);
     menorRegiao(regioes, menoresRegiao);
@@ -392,10 +361,6 @@ int main(int argc, char const *argv[]) {
 
     // Ordena todos os dados do pais
     quickSort(regioes->m, 0, (regioes->R * regioes->C * regioes->A) - 1);
-
-    // printf("MATRIZ ORDENADA POR Brasil: \n");
-    // exibe(regioes);
-    // printf("\n\n");
 
 
     // Chamando funcoes para o Brasil
