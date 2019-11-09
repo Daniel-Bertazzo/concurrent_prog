@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-#include <time.h>
+// #include <time.h>
 #include <omp.h>
 
 // Struct que representa as regioes
@@ -57,11 +57,11 @@ int partition(int arr[], int low, int high) {
 void quickSort(int arr[], int low, int high) { 
     if (low < high) 
     {   
-        int pi;
-        #pragma omp task default(none) firstprivate(arr, low, high) shared(pi)
-        {
-            pi = partition(arr, low, high); 
-        }
+        // int pi;
+        // #pragma omp task default(none) firstprivate(arr, low, high) shared(pi)
+        // {
+        int pi = partition(arr, low, high); 
+        //}
         
         #pragma omp task default(none) firstprivate(arr, low, pi)
         {
@@ -386,8 +386,8 @@ int main(int argc, char const *argv[]) {
     // printf("\n\n");
 
     // Comeca a medir o tempo
-    //double wtime = omp_get_wtime();
-    inicio = clock();
+    double wtime = omp_get_wtime();
+    // inicio = clock();
 
     // Ordena as notas de cada cidade (ordena as linhas)
     int tamCidade = regioes->A;
@@ -458,7 +458,7 @@ int main(int argc, char const *argv[]) {
     int *a = regioes->m;
     int t = ( (regioes->R * regioes->C * regioes->A) - 1);
     // Ordena todos os dados do pais
-    #pragma omp parellel default (none) shared (a,t)
+    #pragma omp parallel default (none) shared (a,t)
     {
         #pragma omp single nowait
         {
@@ -489,9 +489,9 @@ int main(int argc, char const *argv[]) {
     dpBrasil = desvioPadraoBrasil(regioes,maBrasil);
 
     // Para de medir o tempo
-    //wtime = omp_get_wtime() - wtime;
-    fim = clock();
-    delta = ((double) (fim - inicio)) / CLOCKS_PER_SEC;    
+    wtime = omp_get_wtime() - wtime;
+    // fim = clock();
+    // delta = ((double) (fim - inicio)) / CLOCKS_PER_SEC;    
 
     /* ..:: Imprimir os resultados ::.. */
     double maiorMediaCidade = maCidade[0], maiorMediaRegiao = maRegiao[0];
@@ -535,7 +535,7 @@ int main(int argc, char const *argv[]) {
     printf("Melhor cidade: Região %d, Cidade %d\n", qualCidadeRegiao, qualCidade);
 
 
-    printf("Tempo de resposta sem considerar E/S, em segundos: %fs\n", delta);
+    printf("Tempo de resposta sem considerar E/S, em segundos: %fs\n", wtime);
 
     /* ..:: Liberando memoria ::.. */
     free(regioes->m);
