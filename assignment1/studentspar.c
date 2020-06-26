@@ -87,7 +87,7 @@ Regioes *le_entrada() {
 
     // Monta matriz de dimensoes R*C x A (representada por um vetor)
     // Essa unica matriz vai representar todas as regioes, com seus respectivos dados
-    aux->m = (int *) malloc(R*C*A * sizeof(int *));
+    aux->m = (int *) malloc(R*C*A * sizeof(int));
     for(i = 0; i < R*C; i++) {    
         for(j = 0; j < A; j++) {
             aux->m[i*A + j] = rand() % 101; // Valores de 0 a 100
